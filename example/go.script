@@ -45,25 +45,82 @@ local height_map_size = 129
 -- PROPERTIES
 ----------------------------------------------------------------------
 
+go.property("tilesource_1", resource.tile_source("/example/tilesource_1.tilesource"))
+go.property("tilesource_2", resource.tile_source("/example/tilesource_2.tilesource"))
 local height_map = {}
+local random_scalar = 1
 
 ----------------------------------------------------------------------
 -- FUNCTIONS
 ----------------------------------------------------------------------
 
 local function draw_terrain()
-	
+	for i = 1, height_map_size do
+		for j = 1, height_map_size do
+			if height_map[i][j] ~= 0 then
+				tilemap.set_tile("#tilemap", "layer1", j, i, height_map[i][j])
+			end
+		end
+	end
 end
 
-local function diamond_square_iteration()
-	
+local function get_random_supplement()
+	return math.random(-1, 1) * random_scalar
 end
 
-local function diamond_square()
-	height_map[1][1] = math.random(height_min, height_max)
-	height_map[height_map_size][1] = math.random(height_min, height_max)
-	height_map[height_map_size][height_map_size] = math.random(height_min, height_max)
-	height_map[1][height_map_size] = math.random(height_min, height_max)
+local function get_diamond_average(mid_x, mid_y, radius)
+	local sum = 0
+	local count = 0
+	if mid_y - radius > 0 then
+		sum = sum + height_map[mid_y - radius][mid_x]
+		count = count + 1
+	end
+	if mid_x - radius > 0 then
+		sum = sum + height_map[mid_y][mid_x - radius]
+		count = count + 1
+	end
+	if mid_x + radius <= height_map_size then
+		sum = sum + height_map[mid_y][mid_x + radius]
+		count = count + 1
+	end
+	if mid_y + radius <= height_map_size then
+		sum = sum + height_map[mid_y + radius][mid_x]
+		count = count + 1
+	end
+	local result = math.ceil(sum / count + get_random_supplement())
+	if result < height_min then
+		return height_min
+	end
+	if result > height_max then
+		return height_max
+	end
+	return result
+end
+
+local function get_square_average(mid_x, mid_y, radius)
+	local result = math.ceil((height_map[mid_y - radius][mid_x - radius] + height_map[mid_y - radius][mid_x + radius] + height_map[mid_y + radius][mid_x - radius] + height_map[mid_y + radius][mid_x + radius]) * 0.25 + get_random_supplement())
+	if result < height_min then
+		return height_min
+	end
+	if result > height_max then
+		return height_max
+	end
+	return result
+end
+
+local function diamond_square_recurse(mid_x, mid_y, radius)
+	height_map[mid_y][mid_x] = get_square_average(mid_x, mid_y, radius)
+	height_map[mid_y - radius][mid_x] = get_diamond_average(mid_x, mid_y - radius, radius)
+	height_map[mid_y][mid_x - radius] = get_diamond_average(mid_x - radius, mid_y, radius)
+	height_map[mid_y][mid_x + radius] = get_diamond_average(mid_x + radius, mid_y, radius)
+	height_map[mid_y + radius][mid_x] = get_diamond_average(mid_x, mid_y + radius, radius)
+	local next_radius = radius * 0.5
+	if radius > 1 then
+		diamond_square_recurse(mid_x - next_radius, mid_y - next_radius, next_radius)
+		diamond_square_recurse(mid_x + next_radius, mid_y - next_radius, next_radius)
+		diamond_square_recurse(mid_x - next_radius, mid_y + next_radius, next_radius)
+		diamond_square_recurse(mid_x + next_radius, mid_y + next_radius, next_radius)
+	end
 end
 
 local function init_height_map()
@@ -76,18 +133,48 @@ local function init_height_map()
 	end
 end
 
+local function diamond_square()
+	init_height_map()
+	height_map[1][1] = math.random(height_min, height_max)
+	height_map[1][height_map_size] = math.random(height_min, height_max)
+	height_map[height_map_size][1] = math.random(height_min, height_max)
+	height_map[height_map_size][height_map_size] = math.random(height_min, height_max)
+	local mid = math.ceil(height_map_size * 0.5)
+	diamond_square_recurse(mid, mid, math.floor(height_map_size * 0.5))
+end
+
 function init(self)
 	msg.post("#", h_str.acquire_input_focus)
 	math.randomseed(os.clock() * 100000000000)
-	init_height_map()
 	diamond_square()
 	draw_terrain()
-	pprint(height_map)
 end
 
 function on_input(self, action_id, action)
-	if action.pressed and action_id == h_str.button_left then
-		diamond_square()
-		draw_terrain()
+	if action.pressed then
+		if action_id == h_str.button_left then
+			diamond_square()
+			draw_terrain()
+		elseif action_id == h_str.one then
+			go.set("#tilemap", "tile_source", self.tilesource_1)
+		elseif action_id == h_str.two then
+			go.set("#tilemap", "tile_source", self.tilesource_2)
+		elseif action_id == h_str.three then
+			random_scalar = random_scalar - 0.1
+			if random_scalar < 0 then
+				random_scalar = 0
+			else
+				diamond_square()
+				draw_terrain()
+			end
+		elseif action_id == h_str.four then
+			random_scalar = random_scalar + 0.1
+			if random_scalar > height_max then
+				random_scalar = height_max
+			else
+				diamond_square()
+				draw_terrain()
+			end
+		end
 	end
 end
