@@ -9,5 +9,7 @@ h_str.one = hash("one")
 h_str.two = hash("two")
 h_str.three = hash("three")
 h_str.four = hash("four")
+h_str.update_random_scalar = hash("update_random_scalar")
+h_str.random_scalar = hash("random_scalar")
 
 return h_str
