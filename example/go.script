@@ -66,7 +66,13 @@ end
 
 local function round(value)
 	local result = math.ceil(value) - value >= value - math.floor(value) and math.floor(value) or math.ceil(value)
-	return result <= 0 and 1 or result
+	if result < height_min then
+		return height_min
+	end
+	if result > height_max then
+		return height_max
+	end
+	return result
 end
 
 local function random()
@@ -100,23 +106,21 @@ local function diamond_square()
 				height_map[y + chunk_size_half][x + chunk_size_half] = round(average + random())
 			end
 		end
-		if chunk_size == 2 then return end
-		for y = 1, height_map_size - 1, chunk_size_half do
-			for x = (y + chunk_size_half) % chunk_size, height_map_size - 1, chunk_size do
+		for y = 1, height_map_size, chunk_size_half do
+			for x = (y + chunk_size_half) % chunk_size, height_map_size, chunk_size do
 				local left = (x - chunk_size_half + height_map_size - 1) % (height_map_size - 1)
 				local right = (x + chunk_size_half) % (height_map_size - 1)
 				local bottom = (y + chunk_size_half) % (height_map_size - 1)
 				local top = (y - chunk_size_half + height_map_size - 1) % (height_map_size - 1)
+				if x == 0 then x = 1 end
+				if left == 0 then left = 1 end
+				if right == 0 then right = 1 end
+				if bottom == 0 then bottom = 1 end
+				if top == 0 then top = 1 end
 				local sum = height_map[y][left] + height_map[y][right] + height_map[bottom][x] + height_map[top][x]
 				local average = sum * 0.25
-				local rand = random()
-				height_map[x][y] = round(average + rand)
-				if x == 1 then
-					height_map[height_map_size][y] = average + rand
-				end
-				if y == 1 then
-					height_map[x][height_map_size] = average + rand
-				end
+				local result = round(average + random())
+				height_map[x][y] = result
 			end
 		end
 		chunk_size = math.ceil(chunk_size * 0.5)

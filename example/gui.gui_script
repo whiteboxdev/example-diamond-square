@@ -2,7 +2,6 @@ local h_str = require "example.h_str"
 
 function on_message(self, message_id, message, sender)
 	if message_id == h_str.update_random_scalar then
-		pprint(message)
 		gui.set_text(gui.get_node(h_str.random_scalar), "Random Scalar = " .. message.value)
 	end
 end
