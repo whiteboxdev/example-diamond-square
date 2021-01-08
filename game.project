@@ -21,3 +21,7 @@ default_texture_mag_filter = nearest
 [tilemap]
 max_tile_count = 16641
 
+[html5]
+show_fullscreen_button = 0
+scale_mode = no_scale
+

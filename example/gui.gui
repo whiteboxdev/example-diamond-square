@@ -162,7 +162,7 @@ nodes {
   }
   type: TYPE_TEXT
   blend_mode: BLEND_MODE_ALPHA
-  text: "Random Scalar = 1"
+  text: "Random Scalar = 8"
   font: "font_1"
   id: "random_scalar"
   xanchor: XANCHOR_LEFT

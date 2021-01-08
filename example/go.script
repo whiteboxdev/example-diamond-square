@@ -49,8 +49,8 @@ go.property("tilesource_1", resource.tile_source("/example/tilesource_1.tilesour
 go.property("tilesource_2", resource.tile_source("/example/tilesource_2.tilesource"))
 
 local height_map = {}
-local random_scalar_max = 1
-local random_scalar = 1
+local random_scalar_start = 8
+local random_scalar = random_scalar_start
 
 ----------------------------------------------------------------------
 -- FUNCTIONS
@@ -91,23 +91,26 @@ end
 
 local function diamond_square()
 	init_height_map()
-	random_scalar = random_scalar_max
+	random_scalar = random_scalar_start
 	height_map[1][1] = math.random(height_min, height_max)
 	height_map[1][height_map_size] = math.random(height_min, height_max)
 	height_map[height_map_size][1] = math.random(height_min, height_max)
 	height_map[height_map_size][height_map_size] = math.random(height_min, height_max)
 	local chunk_size = height_map_size - 1
 	while chunk_size > 1 do
-		local chunk_size_half = chunk_size * 0.5
+		local chunk_size_half = chunk_size / 2
 		for y = 1, height_map_size - 1, chunk_size do
 			for x = 1, height_map_size - 1, chunk_size do
-				local sum = height_map[y][x] + height_map[y][x + chunk_size] + height_map[y + chunk_size][x] + height_map[y + chunk_size][x + chunk_size]
-				local average = sum * 0.25
-				height_map[y + chunk_size_half][x + chunk_size_half] = round(average + random())
+				height_map[y + chunk_size_half][x + chunk_size_half] = round((height_map[y][x] + height_map[y][x + chunk_size] + height_map[y + chunk_size][x] + height_map[y + chunk_size][x + chunk_size]) / 4 + random())
 			end
 		end
 		for y = 1, height_map_size, chunk_size_half do
 			for x = (y + chunk_size_half) % chunk_size, height_map_size, chunk_size do
+				----------------------------------------------------------------------
+				-- Extra conditionals are made here due to Lua's 1-indexing of arrays.
+				-- When we use %, the result may be 0.
+				-- Therefore, we must change it to 1 to agree to Lua's arrays.
+				-- In 0-indexed languages, the following code may be condensed into one line.
 				local left = (x - chunk_size_half + height_map_size - 1) % (height_map_size - 1)
 				local right = (x + chunk_size_half) % (height_map_size - 1)
 				local bottom = (y + chunk_size_half) % (height_map_size - 1)
@@ -117,14 +120,12 @@ local function diamond_square()
 				if right == 0 then right = 1 end
 				if bottom == 0 then bottom = 1 end
 				if top == 0 then top = 1 end
-				local sum = height_map[y][left] + height_map[y][right] + height_map[bottom][x] + height_map[top][x]
-				local average = sum * 0.25
-				local result = round(average + random())
-				height_map[x][y] = result
+				----------------------------------------------------------------------
+				height_map[x][y] = round((height_map[y][left] + height_map[y][right] + height_map[bottom][x] + height_map[top][x]) / 4 + random())
 			end
 		end
-		chunk_size = math.ceil(chunk_size * 0.5)
-		random_scalar = math.max(random_scalar * 0.5, 0.1)
+		chunk_size = chunk_size / 2
+		random_scalar = math.max(random_scalar / 2, 0.1)
 	end
 end
 
@@ -145,20 +146,20 @@ function on_input(self, action_id, action)
 		elseif action_id == h_str.two then
 			go.set("#tilemap", "tile_source", self.tilesource_2)
 		elseif action_id == h_str.three then
-			random_scalar_max = random_scalar_max - 1
-			if random_scalar_max < 0 then
-				random_scalar_max = 0
+			random_scalar_start = random_scalar_start - 1
+			if random_scalar_start < 0 then
+				random_scalar_start = 0
 			else
-				msg.post("#gui", h_str.update_random_scalar, { value = random_scalar_max })
+				msg.post("#gui", h_str.update_random_scalar, { value = random_scalar_start })
 				diamond_square()
 				draw()
 			end
 		elseif action_id == h_str.four then
-			random_scalar_max = random_scalar_max + 1
-			if random_scalar_max > height_max then
-				random_scalar_max = height_max
+			random_scalar_start = random_scalar_start + 1
+			if random_scalar_start > height_max then
+				random_scalar_start = height_max
 			else
-				msg.post("#gui", h_str.update_random_scalar, { value = random_scalar_max })
+				msg.post("#gui", h_str.update_random_scalar, { value = random_scalar_start })
 				diamond_square()
 				draw()
 			end
