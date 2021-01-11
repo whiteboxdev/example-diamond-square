@@ -65,7 +65,7 @@ local function draw()
 end
 
 local function round(value)
-	local result = math.ceil(value) - value >= value - math.floor(value) and math.floor(value) or math.ceil(value)
+	local result = math.abs(math.ceil(value) - value) > math.abs(value - math.floor(value)) and math.floor(value) or math.ceil(value)
 	if result < height_min then
 		return height_min
 	end
@@ -106,22 +106,28 @@ local function diamond_square()
 		end
 		for y = 1, height_map_size, chunk_size_half do
 			for x = (y + chunk_size_half) % chunk_size, height_map_size, chunk_size do
-				----------------------------------------------------------------------
-				-- Extra conditionals are made here due to Lua's 1-indexing of arrays.
-				-- When we use %, the result may be 0.
-				-- Therefore, we must change it to 1 to agree to Lua's arrays.
-				-- In 0-indexed languages, the following code may be condensed into one line.
-				local left = (x - chunk_size_half + height_map_size - 1) % (height_map_size - 1)
-				local right = (x + chunk_size_half) % (height_map_size - 1)
-				local bottom = (y + chunk_size_half) % (height_map_size - 1)
-				local top = (y - chunk_size_half + height_map_size - 1) % (height_map_size - 1)
-				if x == 0 then x = 1 end
-				if left == 0 then left = 1 end
-				if right == 0 then right = 1 end
-				if bottom == 0 then bottom = 1 end
-				if top == 0 then top = 1 end
-				----------------------------------------------------------------------
-				height_map[x][y] = round((height_map[y][left] + height_map[y][right] + height_map[bottom][x] + height_map[top][x]) / 4 + random())
+				-- Line 111 below is only required because Lua's arrays are 1-indexed.
+				-- In 0-indexed languages, the modulus used on line 108 above works without correction.
+				if x == 0 then x = chunk_size end
+				local sum = 0
+				local count = 0
+				if x - chunk_size_half > 0 then
+					sum = sum + height_map[y][x - chunk_size_half]
+					count = count + 1
+				end
+				if x + chunk_size_half <= height_map_size then
+					sum = sum + height_map[y][x + chunk_size_half]
+					count = count + 1
+				end
+				if y - chunk_size_half > 0 then
+					sum = sum + height_map[y - chunk_size_half][x]
+					count = count + 1
+				end
+				if y + chunk_size_half <= height_map_size then
+					sum = sum + height_map[y + chunk_size_half][x]
+					count = count + 1
+				end
+				height_map[y][x] = round(sum / count + random())
 			end
 		end
 		chunk_size = chunk_size / 2
