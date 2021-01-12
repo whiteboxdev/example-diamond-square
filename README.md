@@ -1,12 +1,12 @@
 # Diamond Square
 Demonstration of the diamond square algorithm and procedural map generation.
 
-Watch the reference video: https://www.youtube.com/watch?v=  
+Watch the reference video: https://www.youtube.com/watch?v=4GuAV1PnurU
 Play with the interactive HTML5 demo: https://klaytonkowalski.github.io/bundles/diamond-square/index.html
 
 Please click the "Star" button on GitHub if you find this asset to be useful!
 
-![alt text](https://github.com/klaytonkowalski/diamond-square/blob/master/assets/thumbnail.png?raw=true)
+![alt text](https://github.com/klaytonkowalski/diamond-square/blob/main/assets/thumbnail.png?raw=true)
 
 ## Controls
 The demo uses the following controls:
