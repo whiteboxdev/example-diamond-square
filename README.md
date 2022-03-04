@@ -1,5 +1,5 @@
 # Diamond Square
-Demonstration of the diamond square algorithm and procedural map generation.
+Example of the diamond square algorithm and procedural map generation.
 
 Watch the reference video: https://www.youtube.com/watch?v=4GuAV1PnurU  
 Play with the interactive HTML5 demo: https://klaytonkowalski.github.io/bundles/diamond-square/index.html
