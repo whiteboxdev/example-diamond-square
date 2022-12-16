@@ -4,7 +4,7 @@ Example of the diamond square algorithm and procedural map generation.
 Watch the reference video: https://www.youtube.com/watch?v=4GuAV1PnurU  
 Play with the interactive HTML5 demo: https://klaytonkowalski.github.io/bundles/diamond-square/index.html
 
-Please click the "Star" button on GitHub if you find this asset to be useful!
+Please click the ☆ button on GitHub if this repository is useful or interesting. Thank you!
 
 ![alt text](https://github.com/klaytonkowalski/diamond-square/blob/main/assets/thumbnail.png?raw=true)
 
