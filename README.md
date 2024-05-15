@@ -6,11 +6,11 @@ Watch the reference video:
 https://www.youtube.com/watch?v=4GuAV1PnurU
 
 Play with the interactive HTML5 demo:  
-https://klaytonkowalski.github.io/bundles/diamond-square/index.html
+https://whiteboxdev.github.io/bundles/example-diamond-square/index.html
 
 Please click the ☆ button on GitHub if this repository is useful or interesting. Thank you!
 
-![alt text](https://github.com/klaytonkowalski/example-diamond-square/blob/main/assets/thumbnail.png?raw=true)
+![alt text](https://github.com/whiteboxdev/example-diamond-square/blob/main/assets/thumbnail.png?raw=true)
 
 ## Controls
 

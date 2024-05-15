@@ -13,6 +13,9 @@ input_method = HiddenInputField
 
 [project]
 title = Diamond Square
+version = 1.0.0
+publisher = Klayton Kowalski
+developer = Klayton Kowalski
 
 [graphics]
 default_texture_min_filter = nearest
@@ -24,4 +27,5 @@ max_tile_count = 16641
 [html5]
 show_fullscreen_button = 0
 scale_mode = no_scale
+cssfile = /builtins/manifests/web/dark_theme.css
 
